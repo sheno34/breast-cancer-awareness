@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Breast Cancer Awareness</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f8f3f8;
+    }
+    header {
+      background-color: #ff6699;
+      padding: 20px;
+      color: white;
+      font-size: 2em;
+    }
+    section {
+      margin: 20px;
+    }
+    .quiz-container, .game-container {
+      display: none;
+      margin-top: 20px;
+    }
+    button {
+      margin: 10px;
+      padding: 10px 20px;
+      font-size: 1em;
+      background-color: #ff6699;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #ff3366;
+    }
+    canvas {
+      border: 2px solid black;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>Breast Cancer Awareness</header>
+
+  <section>
+    <button onclick="showQuiz()">Take the Quiz</button>
+    <button onclick="startGame()">Play the Game</button>
+  </section>
+
+  <!-- Quiz Section -->
+  <section class="quiz-container" id="quiz-container">
+    <h2>Quiz: Test Your Knowledge!</h2>
+    <p id="question"></p>
+    <button onclick="submitAnswer(true)">True</button>
+    <button onclick="submitAnswer(false)">False</button>
+    <p id="quiz-result"></p>
+  </section>
+
+  <!-- Game Section -->
+  <section class="game-container" id="game-container">
+    <h2>Collect the Ribbons!</h2>
+    <p>Collect as many ribbons as you can in 20 seconds!</p>
+    <p id="score">Score: 0</p>
+    <canvas id="gameCanvas" width="400" height="400"></canvas>
+  </section>
+
+  <script>
+    // QUIZ LOGIC
+    const quizContainer = document.getElementById("quiz-container");
+    const questionElement = document.getElementById("question");
+    const quizResult = document.getElementById("quiz-result");
+    let quizIndex = 0;
+    const questions = [
+      { q: "Breast cancer only affects women.", a: false },
+      { q: "Early detection improves survival rates.", a: true },
+      { q: "A healthy lifestyle can reduce the risk of breast cancer.", a: true }
+    ];
+
+    function showQuiz() {
+      quizContainer.style.display = "block";
+      document.getElementById("game-container").style.display = "none";
+      showQuestion();
+    }
+
+    function showQuestion() {
+      questionElement.textContent = questions[quizIndex].q;
+    }
+
+    function submitAnswer(answer) {
+      if (answer === questions[quizIndex].a) {
+        quizResult.textContent = "Correct!";
+      } else {
+        quizResult.textContent = "Incorrect. Try again!";
+      }
+      quizIndex = (quizIndex + 1) % questions.length;
+      showQuestion();
+    }
+
+    // GAME LOGIC
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+    const scoreDisplay = document.getElementById("score");
+    const ribbonImage = new Image();
+    ribbonImage.src = "ribbon.png"; // Ensure ribbon.png is in the same folder
+
+    let ribbons = [];
+    let score = 0;
+    let gameTimer;
+
+    function startGame() {
+      document.getElementById("game-container").style.display = "block";
+      quizContainer.style.display = "none";
+      score = 0;
+      ribbons = generateRibbons(5);
+      scoreDisplay.textContent = "Score: 0";
+      gameLoop();
+
+      if (gameTimer) clearTimeout(gameTimer);
+      gameTimer = setTimeout(endGame, 20000); // 20 seconds
+    }
+
+    function generateRibbons(count) {
+      const ribbonsArray = [];
+      for (let i = 0; i < count; i++) {
+        ribbonsArray.push(randomRibbon());
+      }
+      return ribbonsArray;
+    }
+
+    function randomRibbon() {
+      return {
+        x: Math.random() * (canvas.width - 30),
+        y: Math.random() * (canvas.height - 30)
+      };
+    }
+
+    function drawRibbons() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ribbons.forEach(ribbon => {
+        ctx.drawImage(ribbonImage, ribbon.x, ribbon.y, 30, 30);
+      });
+    }
+
+    function gameLoop() {
+      drawRibbons();
+      requestAnimationFrame(gameLoop);
+    }
+
+    canvas.addEventListener("click", (e) => {
+      const clickX = e.offsetX;
+      const clickY = e.offsetY;
+
+      ribbons.forEach((ribbon, index) => {
+        const hit = clickX > ribbon.x && clickX < ribbon.x + 30 &&
+                    clickY > ribbon.y && clickY < ribbon.y + 30;
+        if (hit) {
+          score++;
+          scoreDisplay.textContent = "Score: " + score;
+          ribbons[index] = randomRibbon(); // Respawn the clicked ribbon
+        }
+      });
+    });
+
+    function endGame() {
+      alert("Time's up! Your final score is: " + score);
+      ribbons = [];
+      drawRibbons(); // Clear the canvas after the game ends
+    }
+  </script>
+
+</body>
+</html>
