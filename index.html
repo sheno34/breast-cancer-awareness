@@ -6,49 +6,78 @@
   <title>Breast Cancer Awareness</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Arial', sans-serif;
+      background-color: #fff0f5;
+      margin: 0;
+      padding: 0;
       text-align: center;
-      background-color: #f8f3f8;
     }
+
     header {
-      background-color: #ff6699;
+      background-color: #ff69b4;
       padding: 20px;
       color: white;
-      font-size: 2em;
+      font-size: 2.5em;
+      font-weight: bold;
     }
+
     section {
-      margin: 20px;
+      margin: 30px auto;
+      width: 80%;
+      max-width: 600px;
     }
+
     .quiz-container, .game-container, .review-container {
       display: none;
       margin-top: 20px;
     }
+
     button {
       margin: 10px;
-      padding: 10px 20px;
-      font-size: 1em;
-      background-color: #ff6699;
+      padding: 15px 30px;
+      font-size: 1.1em;
+      background-color: #ff69b4;
       color: white;
       border: none;
-      border-radius: 5px;
+      border-radius: 25px;
       cursor: pointer;
+      transition: background-color 0.3s;
     }
+
     button:hover {
-      background-color: #ff3366;
+      background-color: #ff1493;
     }
+
     canvas {
-      border: 2px solid black;
+      border: 2px solid #333;
       margin-top: 10px;
+    }
+
+    .image-container img {
+      width: 50%;
+      max-width: 300px;
+      border-radius: 15px;
+      margin-top: 20px;
+    }
+
+    footer {
+      margin-top: 40px;
+      font-size: 0.9em;
+      color: #666;
     }
   </style>
 </head>
 <body>
 
-  <header>Breast Cancer Awareness</header>
+  <header>💖 Breast Cancer Awareness 💖</header>
 
   <section>
-    <button onclick="showQuiz()">Take the Quiz</button>
-    <button onclick="startGame()">Play the Game</button>
+    <p style="font-size: 1.2em;">Learn and raise awareness through our quiz and game!</p>
+    <div class="image-container">
+      <img src="ribbons.png" alt="Breast Cancer Awareness - October">
+    </div>
+    <button onclick="showQuiz()">📋 Take the Quiz</button>
+    <button onclick="startGame()">🎮 Play the Game</button>
   </section>
 
   <!-- Quiz Section -->
@@ -74,8 +103,12 @@
     <canvas id="gameCanvas" width="300" height="300"></canvas>
   </div>
 
+  <footer>© 2024 Breast Cancer Awareness Initiative</footer>
+
+  <audio id="clickSound" src="https://www.soundjay.com/button/sounds/button-3.mp3" preload="auto"></audio>
+  <audio id="correctSound" src="https://www.soundjay.com/button/sounds/button-10.mp3" preload="auto"></audio>
+
   <script>
-    // Quiz Logic
     const questions = [
       { 
         question: "Breast cancer only affects women.", 
@@ -93,29 +126,9 @@
         explanation: "A balanced diet lowers cancer risk and promotes overall health." 
       },
       { 
-        question: "Men cannot get breast cancer.", 
-        answer: false, 
-        explanation: "Although rare, men can develop breast cancer." 
-      },
-      { 
         question: "Family history increases cancer risk.", 
         answer: true, 
         explanation: "A family history of breast cancer is a known risk factor." 
-      },
-      { 
-        question: "Exercise can lower the risk of cancer.", 
-        answer: true, 
-        explanation: "Regular physical activity has been linked to lower cancer risk." 
-      },
-      { 
-        question: "Only older people get breast cancer.", 
-        answer: false, 
-        explanation: "Breast cancer can develop at any age, though risk increases with age." 
-      },
-      { 
-        question: "Regular screenings help in early detection.", 
-        answer: true, 
-        explanation: "Screenings like mammograms detect cancer early, improving outcomes." 
       }
     ];
 
@@ -134,23 +147,26 @@
       if (currentQuestion < questions.length) {
         document.getElementById('question').textContent = questions[currentQuestion].question;
         document.getElementById('feedback').textContent = "";
-        document.getElementById('true-btn').style.display = 'inline-block';
-        document.getElementById('false-btn').style.display = 'inline-block';
       } else {
         showReview();
       }
     }
 
     function checkAnswer(answer) {
+      const correctSound = document.getElementById('correctSound');
+      const clickSound = document.getElementById('clickSound');
+      
       if (questions[currentQuestion].answer === answer) {
         score++;
+        correctSound.play();
         document.getElementById('feedback').textContent = "Correct!";
       } else {
+        clickSound.play();
         document.getElementById('feedback').textContent = "Wrong!";
         incorrectAnswers.push(questions[currentQuestion]);
       }
       currentQuestion++;
-      setTimeout(displayQuestion, 1000); // Show next question after 1 second
+      setTimeout(displayQuestion, 1000);
     }
 
     function showReview() {
@@ -170,21 +186,16 @@
       document.getElementById('review-container').style.display = 'block';
     }
 
-    // Game Logic
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
     let gameScore = 0;
-    let timer = 10;
+    let timer = 20;
     let gameInterval;
 
     function startGame() {
       document.getElementById('game-container').style.display = 'block';
-      document.getElementById('quiz-container').style.display = 'none';
-      document.getElementById('review-container').style.display = 'none';
       gameScore = 0;
-      timer = 10;
-      document.getElementById('game-score').textContent = `Score: ${gameScore}`;
-      document.getElementById('timer').textContent = `Time: ${timer}`;
+      timer = 20;
       gameInterval = setInterval(updateGame, 1000);
       spawnRibbon();
     }
@@ -201,28 +212,22 @@
     function spawnRibbon() {
       const x = Math.random() * (canvas.width - 30);
       const y = Math.random() * (canvas.height - 30);
-
-      ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear previous ribbon
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
       const ribbonImage = new Image();
-      ribbonImage.src = 'ribbon.png'; // Ensure 'ribbon.png' is uploaded in your repo
-
-      ribbonImage.onload = function () {
-        ctx.drawImage(ribbonImage, x, y, 30, 30);
-      };
-
-      canvas.onclick = function (event) {
-        const rect = canvas.getBoundingClientRect();
-        const clickX = event.clientX - rect.left;
-        const clickY = event.clientY - rect.top;
-
-        if (clickX >= x && clickX <= x + 30 && clickY >= y && clickY <= y + 30) {
-          gameScore++;
-          document.getElementById('game-score').textContent = `Score: ${gameScore}`;
-          spawnRibbon(); // Respawn ribbon after click
-        }
-      };
+      ribbonImage.src = 'https://upload.wikimedia.org/wikipedia/commons/8/82/Pink_ribbon.svg';
+      ribbonImage.onload = () => ctx.drawImage(ribbonImage, x, y, 30, 30);
     }
-  </script>
 
+    canvas.onclick = function (event) {
+      const rect = canvas.getBoundingClientRect();
+      const clickX = event.clientX - rect.left;
+      const clickY = event.clientY - rect.top;
+
+      if (clickX >= x && clickX <= x + 30 && clickY >= y && clickY <= y + 30) {
+        gameScore++;
+        spawnRibbon();
+      }
+    };
+  </script>
 </body>
 </html>
