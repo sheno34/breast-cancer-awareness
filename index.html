@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Breast Cancer Awareness</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #fff0f5;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+
+    header {
+      background-color: #ff69b4;
+      padding: 20px;
+      color: white;
+      font-size: 2.5em;
+      font-weight: bold;
+    }
+
+    section {
+      margin: 30px auto;
+      width: 80%;
+      max-width: 600px;
+    }
+
+    .quiz-container, .game-container, .review-container {
+      display: none;
+      margin-top: 20px;
+    }
+
+    button {
+      margin: 10px;
+      padding: 15px 30px;
+      font-size: 1.1em;
+      background-color: #ff69b4;
+      color: white;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #ff1493;
+    }
+
+    canvas {
+      border: 2px solid #333;
+      margin-top: 10px;
+    }
+
+    .image-container img {
+      width: 50%;
+      max-width: 300px;
+      border-radius: 15px;
+      margin-top: 20px;
+    }
+
+    footer {
+      margin-top: 40px;
+      font-size: 0.9em;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+
+  <header>💖 Breast Cancer Awareness 💖</header>
+
+  <section>
+    <p style="font-size: 1.2em;">Learn and raise awareness through our quiz and game!</p>
+    <div class="image-container">
+      <img src="ribbons.png" alt="Breast Cancer Awareness - October">
+    </div>
+    <button onclick="showQuiz()">📋 Take the Quiz</button>
+    <button onclick="startGame()">🎮 Play the Game</button>
+  </section>
+
+  <!-- Quiz Section -->
+  <div class="quiz-container" id="quiz-container">
+    <h2>Quiz on Breast Cancer Awareness</h2>
+    <p id="question"></p>
+    <button id="true-btn" onclick="checkAnswer(true)">True</button>
+    <button id="false-btn" onclick="checkAnswer(false)">False</button>
+    <p id="feedback"></p>
+  </div>
+
+  <!-- Review Section -->
+  <div class="review-container" id="review-container">
+    <h2>Review Your Answers</h2>
+    <div id="review-content"></div>
+  </div>
+
+  <!-- Game Section -->
+  <div class="game-container" id="game-container">
+    <h2>Collect the Ribbons!</h2>
+    <p id="timer">Time: 10</p>
+    <p id="game-score">Score: 0</p>
+    <canvas id="gameCanvas" width="300" height="300"></canvas>
+  </div>
+
+  <footer>© 2024 Breast Cancer Awareness Initiative</footer>
+
+  <audio id="clickSound" src="https://www.soundjay.com/button/sounds/button-3.mp3" preload="auto"></audio>
+  <audio id="correctSound" src="https://www.soundjay.com/button/sounds/button-10.mp3" preload="auto"></audio>
+
+  <script>
+    const questions = [
+      { 
+        question: "Breast cancer only affects women.", 
+        answer: false, 
+        explanation: "Men can also develop breast cancer, though it's less common." 
+      },
+      { 
+        question: "Early detection improves survival rates.", 
+        answer: true, 
+        explanation: "Screening and early detection significantly increase survival rates." 
+      },
+      { 
+        question: "A healthy diet can reduce cancer risk.", 
+        answer: true, 
+        explanation: "A balanced diet lowers cancer risk and promotes overall health." 
+      },
+      { 
+        question: "Family history increases cancer risk.", 
+        answer: true, 
+        explanation: "A family history of breast cancer is a known risk factor." 
+      },
+      { 
+        question: "Regular exercise has no effect on breast cancer risk.", 
+        answer: false, 
+        explanation: "Exercise helps reduce the risk of breast cancer and other diseases." 
+      },
+      { 
+        question: "All breast lumps are cancerous.", 
+        answer: false, 
+        explanation: "Many breast lumps are benign and not related to cancer." 
+      },
+      { 
+        question: "October is Breast Cancer Awareness Month.", 
+        answer: true, 
+        explanation: "October is internationally recognized as Breast Cancer Awareness Month." 
+      }
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+    let incorrectAnswers = [];
+
+    function showQuiz() {
+      document.getElementById('quiz-container').style.display = 'block';
+      document.getElementById('game-container').style.display = 'none';
+      document.getElementById('review-container').style.display = 'none';
+      displayQuestion();
+    }
+
+    function displayQuestion() {
+      if (currentQuestion < questions.length) {
+        document.getElementById('question').textContent = questions[currentQuestion].question;
+        document.getElementById('feedback').textContent = "";
+      } else {
+        showReview();
+      }
+    }
+
+    function checkAnswer(answer) {
+      const correctSound = document.getElementById('correctSound');
+      const clickSound = document.getElementById('clickSound');
+      
+      if (questions[currentQuestion].answer === answer) {
+        score++;
+        correctSound.play();
+        document.getElementById('feedback').textContent = "Correct!";
+      } else {
+        clickSound.play();
+        document.getElementById('feedback').textContent = "Wrong!";
+        incorrectAnswers.push(questions[currentQuestion]);
+      }
+      currentQuestion++;
+      setTimeout(displayQuestion, 1000);
+    }
+
+    function showReview() {
+      document.getElementById('quiz-container').style.display = 'none';
+      const reviewContent = document.getElementById('review-content');
+      reviewContent.innerHTML = `<p>Your score: ${score}/${questions.length}</p>`;
+
+      if (incorrectAnswers.length > 0) {
+        reviewContent.innerHTML += "<h3>Incorrect Answers:</h3>";
+        incorrectAnswers.forEach(item => {
+          reviewContent.innerHTML += `<p><strong>Question:</strong> ${item.question}<br><strong>Explanation:</strong> ${item.explanation}</p>`;
+        });
+      } else {
+        reviewContent.innerHTML += "<p>Well done! You got everything correct!</p>";
+      }
+
+      document.getElementById('review-container').style.display = 'block';
+    }
+
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    let gameScore = 0;
+    let timer = 10;
+    let gameInterval;
+    let x, y;
+
+    function startGame() {
+      document.getElementById('game-container').style.display = 'block';
+      gameScore = 0;
+      timer = 10;
+      gameInterval = setInterval(updateGame, 1000);
+      spawnRibbon();
+    }
+
+    function updateGame() {
+      timer--;
+      document.getElementById('timer').textContent = `Time: ${timer}`;
+      if (timer <= 0) {
+        clearInterval(gameInterval);
+        alert(`Time's up! Your final score is ${gameScore}.`);
+      }
+    }
+
+    function spawnRibbon() {
+      x = Math.random() * (canvas.width - 30);
+      y = Math.random() * (canvas.height - 30);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const ribbonImage = new Image();
+      ribbonImage.src = 'ribbon.png'; // Ensure the image is in the same directory
+      ribbonImage.onload = () => ctx.drawImage(ribbonImage, x, y, 30, 30);
+    }
+
+    canvas.onclick = function (event) {
+      const rect = canvas.getBoundingClientRect();
+      const clickX = event.clientX - rect.left;
+      const clickY = event.clientY - rect.top;
+
+      if (clickX >= x && clickX <= x + 30 && clickY >= y && clickY <= y + 30) {
+        gameScore++;
+        document.getElementById('game-score').textContent = `Score: ${gameScore}`;
+        spawnRibbon();
+      }
+    };
+  </script>
+</body>
+</html>
